@@ -177,10 +177,8 @@ void controlar_tiempo_nivel3() {
 uint16_t tiempo_nivel3 = 0;
 
 int main() {
-    DDRD = 0xFF;
-    DDRB = 0xFF;
-    DDRC = 0x00;
-    PORTC = 0x0F;
+    DDRD = 0xFF; DDRB = 0xFF;
+    DDRC = 0x00; PORTC = 0x0F;
 
     DDRC |= (1 << PC4) | (1 << PC5); // PC4 y PC5 como salidas
     PORTC &= ~((1 << PC4) | (1 << PC5)); // Inicialmente en 0
@@ -197,60 +195,53 @@ int main() {
 
     uint8_t contador_obs = 0;
     
-
-
     while (1) {
-
-
-    leer_botones(); 
+        leer_botones(); 
     
     
-    // Detecta la colision, manda senal de sonido de colision y rinicia nivel.
-    if (colision()) {
+        // Detecta la colision, manda senal de sonido de colision y rinicia nivel.
+        if (colision()) {
 
-        PORTC &= ~(1 << PC4);   // PC4 = 0 (RB1)
-        PORTC |= (1 << PC5);    // PC5 = 1 (RB0)
-        _delay_ms(10);         // Pulso breve
-        PORTC &= ~((1 << PC4) | (1 << PC5)); // Apaga señal
-
-        nivel = 1;
-        reiniciar();
-    }
-
-    // Victoria por nivel
-    if (rana_y == 0) {
-
-        PORTC |= (1 << PC4);    // PC4 = 1 (RB1)
-        PORTC &= ~(1 << PC5);   // PC5 = 0 (RB0)
-        _delay_ms(10);
-        PORTC &= ~((1 << PC4) | (1 << PC5));
-
-        if (nivel < 3) {
-            nivel++;
+            PORTC &= ~(1 << PC4);   // PC4 = 0 (RB1)
+            PORTC |= (1 << PC5);    // PC5 = 1 (RB0)
+            _delay_ms(10);         // Pulso breve
+            PORTC &= ~((1 << PC4) | (1 << PC5)); // Apaga señal
+    
+            nivel = 1;
             reiniciar();
-        } else {
-            victoria_final();
+        }
+
+        // Victoria por nivel
+        if (rana_y == 0) {
+
+            PORTC |= (1 << PC4);    // PC4 = 1 (RB1)
+            PORTC &= ~(1 << PC5);   // PC5 = 0 (RB0)
+            _delay_ms(10);
+            PORTC &= ~((1 << PC4) | (1 << PC5));
+
+            if (nivel < 3) {
+                nivel++;
+                reiniciar();
+            } else {
+                victoria_final();
+            }
+        }
+    
+    
+        for (int i = 0; i < 4; i++) {
+        
+            mostrar();
+
+            controlar_tiempo_nivel3();
+        }
+
+
+        // Mueve los obstaculos
+
+        contador_obs++;
+        if (contador_obs >= 10) { 
+            mover_obstaculos();
+            contador_obs = 0;
         }
     }
-    
-    
-    for (int i = 0; i < 4; i++) {
-        
-        mostrar();
-
-        controlar_tiempo_nivel3();
-    }
-
-
-    // Mueve los obstaculos
-
-    contador_obs++;
-    if (contador_obs >= 10) { 
-        mover_obstaculos();
-        contador_obs = 0;
-    }
-
-    
-    
-}
 }
