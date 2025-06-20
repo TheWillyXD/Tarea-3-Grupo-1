@@ -2,9 +2,9 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-//Posicion de la rana y variable nivel
-uint8_t rana_x = 3;
-uint8_t rana_y = 7;
+//Posicion de la gallina y variable nivel
+uint8_t gallina_x = 3;
+uint8_t gallina_y = 7;
 uint8_t nivel = 1;
 
 uint8_t obstaculos[8];
@@ -43,7 +43,7 @@ void mostrar_letra(uint8_t letra[8], uint16_t duracion_ms) {
     }
 }
 
-//Detectar la señal de los botones para mover la rana con antirebote
+//Detectar la señal de los botones para mover la gallina con antirebote
 void leer_botones() {
     static uint8_t last_state = 0x0F;
     uint8_t current = PINC & 0x0F;
@@ -52,10 +52,10 @@ void leer_botones() {
         _delay_ms(10); // rebote
         current = PINC & 0x0F;
 
-        if (!(current & (1 << PC0)) && rana_y > 0) rana_y--;
-        if (!(current & (1 << PC1)) && rana_y < 7) rana_y++;
-        if (!(current & (1 << PC2)) && rana_x > 0) rana_x--;
-        if (!(current & (1 << PC3)) && rana_x < 7) rana_x++;
+        if (!(current & (1 << PC0)) && gallina_y > 0) gallina_y--;
+        if (!(current & (1 << PC1)) && gallina_y < 7) gallina_y++;
+        if (!(current & (1 << PC2)) && gallina_x > 0) gallina_x--;
+        if (!(current & (1 << PC3)) && gallina_x < 7) gallina_x++;
 
         last_state = current;
     }
@@ -71,9 +71,9 @@ void mover_obstaculos() {
     }
 }
 
-// Detecta la colision la pocision de la rana con las de los obstaculos
+// Detecta la colision la pocision de la gallina con las de los obstaculos
 uint8_t colision() {
-    return (obstaculos[rana_y] & (1 << rana_x));
+    return (obstaculos[gallina_y] & (1 << gallina_x));
 }
 
 // Muestra los obstaculo
@@ -81,7 +81,7 @@ void mostrar() {
     for (uint8_t j = 0; j < 8; j++) {
         PORTD = 1 << j;
         uint8_t fila = obstaculos[j];
-        if (j == rana_y) fila |= (1 << rana_x);
+        if (j == gallina_y) fila |= (1 << gallina_x);
         PORTB = ~fila;
         _delay_ms(0.5);
     }
@@ -131,8 +131,8 @@ void cargar_nivel(uint8_t n) {
 
 //Reiniciar nivel
 void reiniciar() {
-    rana_x = 3;
-    rana_y = 7;
+    gallina_x = 3;
+    gallina_y = 7;
     if (nivel == 1) mostrar_letra(L1, 400);
     if (nivel == 2) mostrar_letra(L2, 400);
     if (nivel == 3) mostrar_letra(L3, 400);
@@ -212,7 +212,7 @@ int main() {
         }
 
         // Victoria por nivel
-        if (rana_y == 0) {
+        if (gallina_y == 0) {
 
             PORTC |= (1 << PC4);    // PC4 = 1 (RB1)
             PORTC &= ~(1 << PC5);   // PC5 = 0 (RB0)
